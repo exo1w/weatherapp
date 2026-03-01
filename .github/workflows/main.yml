@@ -23,7 +23,7 @@ jobs:
 
     - name: Build Docker Image
       run: |
-        docker build -t dockerle12/weatherapp-auth:${{ github.sha }} ./auth
+        docker build -t dockerle12/weatherapp-auth:${{ github.sha }} weatherapp-microservices/auth
         docker tag dockerle12/weatherapp-auth:${{ github.sha }} dockerle12/weatherapp-auth:latest
 
     - name: Push Docker Image
