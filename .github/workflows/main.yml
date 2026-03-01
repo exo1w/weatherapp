@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'auth/**'
+      - 'weatherapp-microservices/auth/**'
 
 jobs:
   build-and-deploy:
