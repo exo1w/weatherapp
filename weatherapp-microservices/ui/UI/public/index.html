@@ -10,52 +10,157 @@
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <!-- Latest compiled and minified CSS -->
+
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
-        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu"
+        crossorigin="anonymous">
 
-    <!-- Optional theme -->
+    <!-- Bootstrap Theme -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
-        integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+        integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ"
+        crossorigin="anonymous">
 
-    <!-- Latest compiled and minified JavaScript -->
+    <!-- Bootstrap JS -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
         integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
         crossorigin="anonymous"></script>
+
     <title>Weather App</title>
+
+    <!-- ✅ Modern UI Style -->
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+
+        .header {
+            margin-top: 20px;
+        }
+
+        .page-header {
+            border: none;
+            margin-top: 20px;
+        }
+
+        .page-header h1 {
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .page-header small {
+            color: #f1f1f1;
+        }
+
+        .container {
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group-lg>.form-control {
+            height: 55px;
+            border-radius: 12px 0 0 12px !important;
+            font-size: 18px;
+        }
+
+        .input-group-btn .btn-warning {
+            height: 55px;
+            border-radius: 0 12px 12px 0 !important;
+            font-size: 18px;
+            background-color: #ff9800;
+            border: none;
+            transition: 0.3s ease;
+        }
+
+        .input-group-btn .btn-warning:hover {
+            background-color: #e68900;
+            transform: scale(1.05);
+        }
+
+        .btn-danger {
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        table {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+        }
+
+        table td {
+            border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+            padding: 15px !important;
+            font-size: 18px;
+        }
+
+        #weather_icon {
+            width: 60px;
+        }
+
+        #spinner {
+            width: 80px;
+            margin-top: 20px;
+        }
+
+        input:focus {
+            box-shadow: none !important;
+            border-color: #ff9800 !important;
+        }
+    </style>
+
 </head>
 
 <body>
+
     <div class="header clearfix">
         <nav>
             <ul class="nav nav-pills pull-right">
-                <li role="presentation"><a href="/logout">
+                <li role="presentation">
+                    <a href="/logout">
                         <button type="button" class="btn btn-danger">Logout</button>
-                    </a></li>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div>
+
     <div class="page-header text-center">
-        <h1><img src="logo.png" alt="Weather App" width="90px"
+        <h1>
+            <img src="logo.png" alt="Weather App" width="90px"
                 style="-webkit-transform: scaleX(-1);transform: scaleX(-1)">
             Weather App
             <small>Sample application for practicing DevOps</small>
         </h1>
     </div>
+
     <div class="container">
         <div class="input-group input-group-lg">
-            <span class="input-group-addon" id="sizing-addon1"><span class="glyphicon glyphicon-search"
-                    aria-hidden="true"></span></span>
-            <input type="text" id="city" class="form-control" placeholder="City Name" aria-describedby="sizing-addon1"
-                required autofocus>
+            <span class="input-group-addon" id="sizing-addon1">
+                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+            </span>
+            <input type="text" id="city" class="form-control" placeholder="City Name"
+                aria-describedby="sizing-addon1" required autofocus>
             <span class="input-group-btn">
                 <button type="button" id="go" class="btn btn-warning">Go!</button>
             </span>
         </div>
+
         <div class="col-md-5">
             <img src="spinner.gif" alt="" id="spinner" style="display: none;">
+
             <table id="result" class="table lead" hidden>
                 <tr>
                     <td colspan="2">
@@ -82,7 +187,9 @@
             </table>
         </div>
     </div>
+
     <script src="/index.js"></script>
+
 </body>
 
 </html>
