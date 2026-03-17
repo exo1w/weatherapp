@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: weatherapp-auth
-          image: dockerle12/weatherapp-auth:v1
+          image: dockerle12/auh-svc:lts
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

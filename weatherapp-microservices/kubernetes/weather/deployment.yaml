@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wheatherapp-weather
+  name: weatherapp-weather
 spec:
   replicas: 2
   selector:
@@ -15,7 +15,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: weatherapp-weather
-          image: dockerle12/weatherapp-weather:v2
+          image: dockerle12/weather-service:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: APIKEY

@@ -2,11 +2,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: weatherapp-auth
+  labels:
+    app: weatherapp-auth
 spec:
   selector:
     app.kubernetes.io/name: weatherapp-auth
-  type: ClusterIP                      
+  type: ClusterIP
   ports:
-  - port: 8080
+  - name: http
+    port: 8080
     targetPort: 8080
     protocol: TCP

@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: weatherapp-slack
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+
+  route:
+    receiver: slack-weather
+    groupBy: ['alertname']
+    groupWait: 10s
+    groupInterval: 30s
+    repeatInterval: 1h
+
+  receivers:
+  - name: slack-weather
+    slackConfigs:
+    - channel: "#weatherapp-channel"
+      sendResolved: true
+      apiURL:
+        name: slack-webhook
+        key: url
+      title: "🚨 WeatherApp Alert"
+      text: |
+            {{ if eq .Status "firing" }}
+              🚨 Alert: {{ .CommonLabels.alertname }}
+              Service: {{ .CommonLabels.service }}
+              Severity: {{ .CommonLabels.severity }}
+              Description: {{ .CommonAnnotations.description }}
+            {{ else }}
+              ✅ Resolved: {{ .CommonLabels.alertname }}
+              Service: {{ .CommonLabels.service }}
+              Description: {{ .CommonAnnotations.description }}
+            {{ end }}

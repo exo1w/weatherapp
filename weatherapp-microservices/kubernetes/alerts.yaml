@@ -1,0 +1,44 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: weather-auth-rules
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: weather-auth-alerts
+      rules:
+        - alert: HighRequestRate
+          expr: sum(rate(auth_service_requests_total[1m])) > 10
+          for: 1m
+          labels:
+            severity: warning
+            service: auth
+            team: devops
+            namespace: monitoring
+            environment: prod
+          annotations:
+            summary: "High request rate on Auth service"
+            description: "Auth service receiving more than 10 requests/sec"
+        - alert: HighWeatherLatency
+          expr: histogram_quantile(0.95, rate(weather_request_duration_seconds_bucket[2m])) > 2
+          for: 2m
+          labels:
+            severity: critical
+            service: weather
+            team: devops
+            environment: prod
+            namespace: monitoring
+          annotations:
+            summary: "Weather API latency high"
+            description: "95th percentile latency above 2 seconds"
+        - alert: WeatherServiceDown
+          expr: kube_deployment_status_replicas_available{deployment="weatherapp-weather", namespace="default"} == 0
+          for: 1m
+          labels:
+            severity: critical
+            service: weather
+          annotations:
+            summary: "Weather deployment has 0 available replicas"
+            description: "All weatherapp-weather pods are down"

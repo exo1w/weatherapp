@@ -1,8 +1,10 @@
-from flask import Flask, jsonify, make_response
+from flask import Flask, jsonify, make_response, Response
 from flask_cors import CORS
 import requests
 import os
 import logging
+from prometheus_client import Counter, Histogram, generate_latest
+import time
 
 app = Flask(__name__)
 CORS(app)
@@ -10,6 +12,19 @@ CORS(app)
 logging.basicConfig(level=logging.INFO)
 
 API_KEY = os.getenv("APIKEY")
+
+# ===== Prometheus Metrics =====
+REQUEST_COUNT = Counter(
+    "weather_requests_total",
+    "Total number of weather requests",
+    ["city"]
+)
+
+REQUEST_LATENCY = Histogram(
+    "weather_request_duration_seconds",
+    "Weather request latency in seconds"
+)
+# ==============================
 
 @app.route("/")
 def health():
@@ -31,6 +46,8 @@ def handle_error(error):
 
 @app.route('/<city>')
 def get_weather(city):
+    start_time = time.time()
+    REQUEST_COUNT.labels(city=city).inc()
 
     if not API_KEY:
         return make_response(jsonify({
@@ -77,6 +94,15 @@ def get_weather(city):
             "error": str(e)
         }), 500)
 
+    finally:
+        REQUEST_LATENCY.observe(time.time() - start_time)
+
+
+# ===== Prometheus metrics endpoint =====
+@app.route("/metrics")
+def metrics():
+    return Response(generate_latest(), mimetype="text/plain")
+# ======================================
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)

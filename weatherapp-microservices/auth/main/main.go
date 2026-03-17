@@ -13,6 +13,9 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 const (
@@ -34,6 +37,19 @@ var (
 	secretKey  = getEnv("SECRET_KEY", defaultSecretKey)
 	authPort   = getEnv("AUTH_PORT", defaultAuthPort)
 )
+
+// Prometheus metrics
+var requestCounter = prometheus.NewCounterVec(
+	prometheus.CounterOpts{
+		Name: "auth_service_requests_total",
+		Help: "Number of requests processed by endpoint",
+	},
+	[]string{"endpoint"},
+)
+
+func init() {
+	prometheus.MustRegister(requestCounter)
+}
 
 type UserCreds struct {
 	Username string `json:"user_name"`
@@ -65,10 +81,13 @@ func main() {
 	corsConfig.AllowCredentials = true
 	router.Use(cors.New(corsConfig))
 
-	// endpoints
+	// Endpoints
 	router.GET("/", health)
 	router.POST("/users", createUser)
 	router.POST("/users/:id", loginUser)
+
+	// Prometheus metrics endpoint
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	fmt.Println("Auth service running on port", authPort)
 	router.Run(":" + authPort)
@@ -85,6 +104,8 @@ func getEnv(key, defaultValue string) string {
 
 // Health endpoint
 func health(c *gin.Context) {
+	requestCounter.WithLabelValues("/").Inc() // تحديث العداد
+
 	db, err := authdb.Connect(dbUser, dbPassword, dbHost, dbPort)
 	if err != nil || db == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database not reachable"})
@@ -95,6 +116,8 @@ func health(c *gin.Context) {
 
 // تسجيل الدخول
 func loginUser(c *gin.Context) {
+	requestCounter.WithLabelValues("/users/:id").Inc() // تحديث العداد
+
 	var uc UserCreds
 	if err := c.BindJSON(&uc); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
@@ -129,6 +152,8 @@ func loginUser(c *gin.Context) {
 
 // إنشاء مستخدم جديد
 func createUser(c *gin.Context) {
+	requestCounter.WithLabelValues("/users").Inc() // تحديث العداد
+
 	var u authdb.User
 	if err := c.BindJSON(&u); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
